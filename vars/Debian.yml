@@ -1,0 +1,5 @@
+---
+rgw_exporter_package: 'docker'
+rgw_exporter_service: 'docker-radosgw-usage-exporter.service'
+rgw_exporter_docker_name: 'radosgw_usage_exporter'
+rgw_exporter_docker_path: '/usr/bin/docker'

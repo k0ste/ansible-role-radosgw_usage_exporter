@@ -1,0 +1,53 @@
+{{ '## ' + hostvars[inventory_hostname]['rgw_exporter_service'] }}
+{{ '# ' + ansible_managed }}
+{{ '# Do not edit manually' }}
+
+{{ '[Unit]' }}
+{{ 'After=docker.service' }}
+{{ 'Requires=docker.service' }}
+
+{{ '[Service]' }}
+{{ 'Restart=always' }}
+{{ 'ExecStartPre=-' + hostvars[inventory_hostname]['rgw_exporter_docker_path'] +
+  ' rm -f ' + hostvars[inventory_hostname]['rgw_exporter_docker_name'] }}
+{{ 'ExecStart=' + hostvars[inventory_hostname]['rgw_exporter_docker_path'] +
+  ' run -p 9242:9242 --name ' +
+  hostvars[inventory_hostname]['rgw_exporter_docker_name'] -}}
+{% if vars['rgw_exporter_settings'] is defined and
+  vars['rgw_exporter_settings'] != '' %}
+{% for r in vars['rgw_exporter_settings'] %}
+{% if r.host is defined and (r.host | urlsplit('path')) %}
+{{ ' \\' }}
+{{ '-e "RADOSGW_SERVER=' + r.host + '"' -}}
+{% endif %}
+{% if r.port is defined and r.port != '' %}
+{{ ' \\' }}
+{{ '-e "VIRTUAL_PORT=' + r.port ~ '"' -}}
+{% endif %}
+{% if r.admin_entry is defined and r.admin_entry != '' %}
+{{ ' \\' }}
+{{ '-e "ADMIN_ENTRY=' + r.admin_entry + '"' -}}
+{% endif %}
+{% if r.cluster_name is defined and r.cluster_name != '' %}
+{{ ' \\' }}
+{{ '-e "CLUSTER_NAME=' + r.cluster_name + '"' -}}
+{% endif %}
+{% if r.access_key is defined and r.access_key != '' %}
+{{ ' \\' }}
+{{ '-e "ACCESS_KEY=' + r.access_key + '"' -}}
+{% endif %}
+{% if r.secret_key is defined and r.secret_key != '' %}
+{{ ' \\' }}
+{{ '-e "SECRET_KEY=' + r.secret_key + '"' -}}
+{% endif %}
+{% endfor %}
+{% endif %}
+{{ ' blemmenes/' + hostvars[inventory_hostname]['rgw_exporter_docker_name'] +
+  ':' + vars['rgw_exporter_version'] }}
+{{ 'ExecStop=/usr/bin/docker stop ' +
+  hostvars[inventory_hostname]['rgw_exporter_docker_name'] }}
+{{ 'SyslogIdentifier=' +
+  hostvars[inventory_hostname]['rgw_exporter_docker_name'] }}
+
+{{ '[Install]' }}
+{{ 'WantedBy=docker.service' }}
