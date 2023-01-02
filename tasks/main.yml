@@ -6,15 +6,6 @@
   when:
     - "hostvars[inventory_hostname]['radosgw_usage_exporter'] is defined"
     - "hostvars[inventory_hostname]['radosgw_usage_exporter'] != ''"
-    - "hostvars[inventory_hostname]['radosgw_usage_exporter'] |
-       community.general.json_query(vars['rgw_exporter_install_package'])
-       is defined"
-    - "hostvars[inventory_hostname]['radosgw_usage_exporter'] |
-       community.general.json_query(vars['rgw_exporter_install_package']) ==
-       'true'"
-  vars:
-    rgw_exporter_install_package:
-      "[] | map(&install_package || 'false', @) | [0]"
 - ansible.builtin.include_tasks:
     file: "deploy_radosgw_usage_exporter.yml"
   when:

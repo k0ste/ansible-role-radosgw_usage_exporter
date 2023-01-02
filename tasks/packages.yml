@@ -4,15 +4,14 @@
   - name: "rgw_exporter | Install the required packages for RedHat via yum"
     ansible.builtin.yum:
       name: "{{ hostvars[inventory_hostname]['rgw_exporter_package'] }}"
-      state:
-        "{{ vars['rgw_exporter_package_state'] | default(omit) }}"
+      state: "present"
       update_cache: "yes"
     when:
       - "hostvars[inventory_hostname]['ansible_pkg_mgr'] == 'yum'"
   - name: "rgw_exporter | Install the required packages for RedHat via dnf"
     ansible.builtin.dnf:
       name: "{{ hostvars[inventory_hostname]['rgw_exporter_package'] }}"
-      state: "{{ vars['rgw_exporter_package_state'] | default(omit) }}"
+      state: "present"
       update_cache: "yes"
     when:
       - "hostvars[inventory_hostname]['ansible_pkg_mgr'] == 'dnf'"
