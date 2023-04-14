@@ -16,3 +16,14 @@
     rgw_exporter_settings:
       "{{ hostvars[inventory_hostname]['radosgw_usage_exporter'] |
       community.general.json_query('[].settings[]') }}"
+    rgw_exporter_port:
+      "{{ hostvars[inventory_hostname]['radosgw_usage_exporter'] |
+      community.general.json_query('[].settings[].port | [0]') }}"
+- name: "rgw_exporter | Set facts about service port"
+  ansible.builtin.set_fact:
+    rgw_exporter_port: "9242"
+  when:
+    - "(vars['rgw_exporter_port'] is defined and
+      (vars['rgw_exporter_port'] == '' or
+      vars['rgw_exporter_port'] == []) or
+      vars['rgw_exporter_port'] is not defined)"

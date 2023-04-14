@@ -11,8 +11,8 @@
 {{ 'ExecStartPre=-' + hostvars[inventory_hostname]['rgw_exporter_docker_path'] +
   ' rm -f ' + hostvars[inventory_hostname]['rgw_exporter_docker_name'] }}
 {{ 'ExecStart=' + hostvars[inventory_hostname]['rgw_exporter_docker_path'] +
-  ' run -p 9242:9242 --name ' +
-  hostvars[inventory_hostname]['rgw_exporter_docker_name'] -}}
+  ' run -p ' ~ vars['rgw_exporter_port'] ~ ':' ~ vars['rgw_exporter_port'] ~
+  ' --name ' + hostvars[inventory_hostname]['rgw_exporter_docker_name'] -}}
 {% if vars['rgw_exporter_settings'] is defined and
   vars['rgw_exporter_settings'] != '' %}
 {% for r in vars['rgw_exporter_settings'] %}
@@ -20,10 +20,8 @@
 {{ ' \\' }}
 {{ '-e "RADOSGW_SERVER=' + r.host + '"' -}}
 {% endif %}
-{% if r.port is defined and r.port != '' %}
 {{ ' \\' }}
-{{ '-e "VIRTUAL_PORT=' + r.port ~ '"' -}}
-{% endif %}
+{{ '-e "VIRTUAL_PORT=' ~ vars['rgw_exporter_port'] ~ '"' -}}
 {% if r.admin_entry is defined and r.admin_entry != '' %}
 {{ ' \\' }}
 {{ '-e "ADMIN_ENTRY=' + r.admin_entry + '"' -}}
@@ -44,8 +42,8 @@
 {% endif %}
 {{ ' blemmenes/' + hostvars[inventory_hostname]['rgw_exporter_docker_name'] +
   ':' + vars['rgw_exporter_version'] }}
-{{ 'ExecStop=/usr/bin/docker stop ' +
-  hostvars[inventory_hostname]['rgw_exporter_docker_name'] }}
+{{ 'ExecStop=' + hostvars[inventory_hostname]['rgw_exporter_docker_path'] +
+  ' stop ' + hostvars[inventory_hostname]['rgw_exporter_docker_name'] }}
 {{ 'SyslogIdentifier=' +
   hostvars[inventory_hostname]['rgw_exporter_docker_name'] }}
 
