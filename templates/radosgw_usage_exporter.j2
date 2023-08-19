@@ -3,8 +3,9 @@
 {{ '# Do not edit manually' }}
 
 {{ '[Unit]' }}
-{{ 'After=docker.service' }}
+{{ 'After=docker.service network.target' }}
 {{ 'Requires=docker.service' }}
+{{ 'Wants=network.target' }}
 
 {{ '[Service]' }}
 {{ 'Restart=always' }}
@@ -12,7 +13,8 @@
   ' rm -f ' + hostvars[inventory_hostname]['rgw_exporter_docker_name'] }}
 {{ 'ExecStart=' + hostvars[inventory_hostname]['rgw_exporter_docker_path'] +
   ' run -p ' ~ vars['rgw_exporter_port'] ~ ':' ~ vars['rgw_exporter_port'] ~
-  ' --name ' + hostvars[inventory_hostname]['rgw_exporter_docker_name'] -}}
+  ' --pull always --name ' +
+  hostvars[inventory_hostname]['rgw_exporter_docker_name'] -}}
 {% if vars['rgw_exporter_settings'] is defined and
   vars['rgw_exporter_settings'] != '' %}
 {% for r in vars['rgw_exporter_settings'] %}
