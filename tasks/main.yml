@@ -6,11 +6,11 @@
   ansible.builtin.include_tasks:
     file: "packages.yml"
   when:
-    - "hostvars[inventory_hostname]['radosgw_usage_exporter'] is defined"
-    - "hostvars[inventory_hostname]['radosgw_usage_exporter'] != ''"
+    - "vars['rgw_exporter_settings'] is defined"
+    - "vars['rgw_exporter_settings'] not in ['', [], None]"
 - name: "rgw_exporter | Include deployment tasks"
-  ansible.builtin.import_tasks:
+  ansible.builtin.include_tasks:
     file: "deploy.yml"
   when:
     - "vars['rgw_exporter_settings'] is defined"
-    - "vars['rgw_exporter_settings'] != ''"
+    - "vars['rgw_exporter_settings'] not in ['', [], None]"

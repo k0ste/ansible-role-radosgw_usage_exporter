@@ -16,7 +16,8 @@
     enabled: "yes"
   when:
     - "hostvars[inventory_hostname]['radosgw_usage_exporter'] is defined"
-    - "hostvars[inventory_hostname]['radosgw_usage_exporter'] != ''"
+    - "hostvars[inventory_hostname]['radosgw_usage_exporter']
+      not in ['', [], None]"
     - "hostvars[inventory_hostname]['radosgw_usage_exporter'] |
        community.general.json_query(vars['rgw_exporter_enable']) is defined"
     - "hostvars[inventory_hostname]['radosgw_usage_exporter'] |
@@ -30,7 +31,8 @@
     enabled: "yes"
   when:
     - "hostvars[inventory_hostname]['radosgw_usage_exporter'] is defined"
-    - "hostvars[inventory_hostname]['radosgw_usage_exporter'] != ''"
+    - "hostvars[inventory_hostname]['radosgw_usage_exporter']
+      not in ['', [], None]"
     - "hostvars[inventory_hostname]['radosgw_usage_exporter'] |
        community.general.json_query(vars['rgw_exporter_enable']) is defined"
     - "hostvars[inventory_hostname]['radosgw_usage_exporter'] |

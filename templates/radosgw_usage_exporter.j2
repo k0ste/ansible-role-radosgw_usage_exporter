@@ -19,30 +19,9 @@
   ' --pull always --name ' +
   hostvars[inventory_hostname]['rgw_exporter_docker_name'] -}}
 {% if vars['rgw_exporter_settings'] is defined and
-  vars['rgw_exporter_settings'] != '' %}
+  vars['rgw_exporter_settings'] not in ['', [], None] %}
 {% for r in vars['rgw_exporter_settings'] %}
-{% if r.host is defined and (r.host | urlsplit('path')) %}
-{{ ' \\' }}
-{{ '-e "RADOSGW_SERVER=' + r.host + '"' -}}
-{% endif %}
-{{ ' \\' }}
-{{ '-e "VIRTUAL_PORT=' ~ vars['rgw_exporter_port'] ~ '"' -}}
-{% if r.admin_entry is defined and r.admin_entry != '' %}
-{{ ' \\' }}
-{{ '-e "ADMIN_ENTRY=' + r.admin_entry + '"' -}}
-{% endif %}
-{% if r.cluster_name is defined and r.cluster_name != '' %}
-{{ ' \\' }}
-{{ '-e "CLUSTER_NAME=' + r.cluster_name + '"' -}}
-{% endif %}
-{% if r.access_key is defined and r.access_key != '' %}
-{{ ' \\' }}
-{{ '-e "ACCESS_KEY=' + r.access_key + '"' -}}
-{% endif %}
-{% if r.secret_key is defined and r.secret_key != '' %}
-{{ ' \\' }}
-{{ '-e "SECRET_KEY=' + r.secret_key + '"' -}}
-{% endif %}
+{% include 'exporter_settings.j2'%}
 {% endfor %}
 {% endif %}
 {{ ' blemmenes/' + hostvars[inventory_hostname]['rgw_exporter_docker_name'] +
