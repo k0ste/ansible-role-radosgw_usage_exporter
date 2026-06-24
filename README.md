@@ -23,19 +23,19 @@ radosgw_usage_exporter:
     settings:
 # Server URL for the RADOSGW api (example: http://objects.dreamhost.com/)
       - host: 'http://127.0.0.1:8087/'
-        insecure:
 # The entry point for an admin request URL (default is 'admin')
         admin_entry: 'admin'
 # S3 access key
         access_key: ''
 # S3 secret key
         secret_key: ''
-# Port to listen
+# Exporter port to listen
         port: '9242'
 # Cluster name
         cluster_name: 'ceph'
 # Timeout when getting metrics (default is '60' seconds)
         timeout: '60'
-# Provide logging level: 'DEBUG', 'INFO', 'WARNING', 'ERROR' or 'CRITICAL'
+# Exporter logging level, one of 'DEBUG', 'INFO', 'WARNING', 'ERROR' or
+# 'CRITICAL' (default is 'INFO')
         log_level: 'INFO'
 ```
