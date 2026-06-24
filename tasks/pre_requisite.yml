@@ -1,32 +1,39 @@
 ---
+- name: "rgw_exporter | Assert that ansible facts gathered successfully"
+  ansible.builtin.assert:
+    that:
+      - "hostvars[inventory_hostname]['ansible_facts']['service_mgr'] is
+        defined"
+    fail_msg: "'ansible_facts' not found. Please enable facts gathering"
+    quiet: "true"
 - name: "rgw_exporter | Assert that system manager is systemd"
   ansible.builtin.assert:
     that:
-      - "hostvars[inventory_hostname]['ansible_service_mgr'] == 'systemd'"
+      - "hostvars[inventory_hostname]['ansible_facts']['service_mgr'] ==
+        'systemd'"
     fail_msg: "System manager is not systemd"
     quiet: "true"
-- name: "rgw_exporter | Add the OS specific varibles"
+- name: "rgw_exporter | Add the OS specific variables"
   ansible.builtin.include_vars:
-    file: "{{ hostvars[inventory_hostname]['ansible_os_family'] + '.yml' }}"
+    file: "{{ hostvars[inventory_hostname]['ansible_facts']['os_family'] +
+      '.yml' }}"
 - name: "rgw_exporter | Set facts about rgw_exporter role"
   ansible.builtin.set_fact:
-    rgw_exporter_version:
-      "{{ hostvars[inventory_hostname]['radosgw_usage_exporter'] |
+    rgw_exporter_version: "{{ lookup('ansible.builtin.vars',
+      'radosgw_usage_exporter') |
       community.general.json_query('[].version | [0]') | default('latest') }}"
-    rgw_exporter_settings:
-      "{{ hostvars[inventory_hostname]['radosgw_usage_exporter'] |
+    rgw_exporter_settings: "{{ lookup('ansible.builtin.vars',
+      'radosgw_usage_exporter') |
       community.general.json_query('[].settings[]') | default(omit) }}"
-    rgw_exporter_port:
-      "{{ hostvars[inventory_hostname]['radosgw_usage_exporter'] |
+    rgw_exporter_port: "{{ lookup('ansible.builtin.vars',
+      'radosgw_usage_exporter') |
       community.general.json_query('[].settings[].port | [0]') }}"
   when:
-    - "hostvars[inventory_hostname]['radosgw_usage_exporter'] is defined"
-    - "hostvars[inventory_hostname]['radosgw_usage_exporter']
-      not in ['', [], None]"
+    - "lookup('ansible.builtin.vars', 'radosgw_usage_exporter', default='')
+      not in ['', [], '[]', None]"
 - name: "rgw_exporter | Set facts about service port"
   ansible.builtin.set_fact:
     rgw_exporter_port: "9242"
   when:
-    - "(vars['rgw_exporter_port'] is defined and
-      vars['rgw_exporter_port'] in ['', [], None]) or
-      vars['rgw_exporter_port'] is not defined"
+    - "lookup('ansible.builtin.vars', 'rgw_exporter_port', default='')
+      in ['', [], '[]', None]"

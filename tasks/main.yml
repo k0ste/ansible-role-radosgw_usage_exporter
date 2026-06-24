@@ -6,11 +6,11 @@
   ansible.builtin.include_tasks:
     file: "packages.yml"
   when:
-    - "vars['rgw_exporter_settings'] is defined"
-    - "vars['rgw_exporter_settings'] not in ['', [], None]"
+    - "lookup('ansible.builtin.vars', 'rgw_exporter_settings')
+      not in ['', [], '[]', None]"
 - name: "rgw_exporter | Include deployment tasks"
   ansible.builtin.include_tasks:
     file: "deploy.yml"
   when:
-    - "vars['rgw_exporter_settings'] is defined"
-    - "vars['rgw_exporter_settings'] not in ['', [], None]"
+    - "lookup('ansible.builtin.vars', 'rgw_exporter_settings')
+      not in ['', [], '[]', None]"

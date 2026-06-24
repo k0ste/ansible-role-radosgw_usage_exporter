@@ -1,17 +1,18 @@
 ---
-- name: "Daemon reload"
+- name: "rgw_exporter | Daemon reload"
   ansible.builtin.systemd:
     daemon_reload: "yes"
-- name: "Restart rgw_exporter"
+  listen: "Daemon reload"
+- name: "rgw_exporter | Restart rgw_exporter"
   ansible.builtin.systemd:
-    name: "{{ hostvars[inventory_hostname]['rgw_exporter_service'] }}"
+    name: "{{ lookup('ansible.builtin.vars', 'rgw_exporter_service') }}"
     state: "restarted"
+  listen: "Restart rgw_exporter"
   when:
-    - "hostvars[inventory_hostname]['radosgw_usage_exporter'] is defined"
-    - "hostvars[inventory_hostname]['radosgw_usage_exporter'] != ''"
-    - "hostvars[inventory_hostname]['radosgw_usage_exporter'] |
-       community.general.json_query(vars['rgw_exporter_restart']) is defined"
-    - "hostvars[inventory_hostname]['radosgw_usage_exporter'] |
-       community.general.json_query(vars['rgw_exporter_restart']) == 'true'"
+    - "lookup('ansible.builtin.vars', 'radosgw_usage_exporter', default='')
+      not in ['', [], '[]', None]"
+    - "lookup('ansible.builtin.vars', 'radosgw_usage_exporter') |
+       community.general.json_query(lookup('ansible.builtin.vars',
+      'rgw_exporter_restart', default='')) == 'true'"
   vars:
     rgw_exporter_restart: "[] | map(&restart || 'false', @) | [0]"

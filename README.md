@@ -5,7 +5,7 @@ Role for deploy Prometheus
 
 ## Requirements
 
-* Ansible 3.0.0+;
+* Ansible 9.0.0+
 
 Example configuration
 -------------------------
@@ -23,6 +23,7 @@ radosgw_usage_exporter:
     settings:
 # Server URL for the RADOSGW api (example: http://objects.dreamhost.com/)
       - host: 'http://127.0.0.1:8087/'
+        insecure:
 # The entry point for an admin request URL (default is 'admin')
         admin_entry: 'admin'
 # S3 access key
@@ -33,4 +34,8 @@ radosgw_usage_exporter:
         port: '9242'
 # Cluster name
         cluster_name: 'ceph'
+# Timeout when getting metrics (default is '60' seconds)
+        timeout: '60'
+# Provide logging level: 'DEBUG', 'INFO', 'WARNING', 'ERROR' or 'CRITICAL'
+        log_level: 'INFO'
 ```

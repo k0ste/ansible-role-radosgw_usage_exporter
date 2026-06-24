@@ -1,35 +1,52 @@
-{{ '## ' + hostvars[inventory_hostname]['rgw_exporter_service'] }}
+{{ '## ' + lookup('ansible.builtin.vars', 'rgw_exporter_service') }}
 {{ '# ' + ansible_managed }}
 {{ '# Do not edit manually' }}
 
 {{ '[Unit]' }}
-{{ 'After=network-online.target docker.service docker.socket' }}
+{{ 'After=network.target network-online.target nss-lookup.target basic.target \
+docker.service docker.socket' }}
 {{ 'Requires=docker.service docker.socket' }}
-{{ 'Wants=network-online.target' }}
+{{ 'Wants=network-online.target nss-lookup.target' }}
 {{ 'StartLimitIntervalSec=30' }}
 {{ 'StartLimitBurst=3' }}
 
 {{ '[Service]' }}
-{{ 'Restart=always' }}
+{{ 'Restart=on-failure' }}
 {{ 'RestartSec=10' }}
-{{ 'ExecStartPre=-' + hostvars[inventory_hostname]['rgw_exporter_docker_path'] +
-  ' rm -f ' + hostvars[inventory_hostname]['rgw_exporter_docker_name'] }}
-{{ 'ExecStart=' + hostvars[inventory_hostname]['rgw_exporter_docker_path'] +
-  ' run -p ' ~ vars['rgw_exporter_port'] ~ ':' ~ vars['rgw_exporter_port'] ~
-  ' --pull always --name ' +
-  hostvars[inventory_hostname]['rgw_exporter_docker_name'] -}}
-{% if vars['rgw_exporter_settings'] is defined and
-  vars['rgw_exporter_settings'] not in ['', [], None] %}
-{% for r in vars['rgw_exporter_settings'] %}
+{{ 'ExecStartPre=-' + lookup('ansible.builtin.vars',
+  'rgw_exporter_docker_path') + ' rm -f ' + lookup('ansible.builtin.vars',
+  'rgw_exporter_docker_name') }}
+{{ 'ExecStart=' + lookup('ansible.builtin.vars', 'rgw_exporter_docker_path') +
+  ' run -p ' ~ lookup('ansible.builtin.vars', 'rgw_exporter_port') ~ ':' ~
+  lookup('ansible.builtin.vars', 'rgw_exporter_port') ~
+  ' --pull always --name ' + lookup('ansible.builtin.vars',
+  'rgw_exporter_docker_name') -}}
+{% if lookup('ansible.builtin.vars', 'rgw_exporter_settings', default='')
+  not in ['', [], '[]', None] %}
+{% for r in lookup('ansible.builtin.vars', 'rgw_exporter_settings') %}
 {% include 'exporter_settings.j2'%}
 {% endfor %}
 {% endif %}
-{{ ' blemmenes/' + hostvars[inventory_hostname]['rgw_exporter_docker_name'] +
-  ':' + vars['rgw_exporter_version'] }}
-{{ 'ExecStop=' + hostvars[inventory_hostname]['rgw_exporter_docker_path'] +
-  ' stop ' + hostvars[inventory_hostname]['rgw_exporter_docker_name'] }}
-{{ 'SyslogIdentifier=' +
-  hostvars[inventory_hostname]['rgw_exporter_docker_name'] }}
+{{ ' blemmenes/' + lookup('ansible.builtin.vars', 'rgw_exporter_docker_name') +
+  ':' + lookup('ansible.builtin.vars', 'rgw_exporter_version') }}
+{{ 'ExecStop=' + lookup('ansible.builtin.vars', 'rgw_exporter_docker_path') +
+  ' stop ' + lookup('ansible.builtin.vars', 'rgw_exporter_docker_name') }}
+{{ 'SyslogIdentifier=' + lookup('ansible.builtin.vars',
+  'rgw_exporter_docker_name') }}
+{{ 'NoNewPrivileges=true' }}
+{{ 'ProtectHome=true' }}
+{{ 'ProtectSystem=strict' }}
+{{ 'ProtectHostname=true' }}
+{{ 'ProtectControlGroups=true' }}
+{{ 'ProtectKernelModules=true' }}
+{{ 'ProtectKernelTunables=true' }}
+{{ 'LockPersonality=true' }}
+{{ 'RestrictRealtime=yes' }}
+{{ 'RestrictNamespaces=yes' }}
+{{ 'MemoryDenyWriteExecute=yes' }}
+{{ 'PrivateDevices=yes' }}
+{{ 'PrivateTmp=true' }}
+{{ 'CapabilityBoundingSet=' }}
 
 {{ '[Install]' }}
 {{ 'WantedBy=docker.service' }}
